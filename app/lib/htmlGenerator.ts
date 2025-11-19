@@ -120,6 +120,32 @@ export async function generateHtmlForPptx(
     cleanedHtml = lines.slice(1, -1).join("\n").trim();
   }
 
+  // JSX形式のstyle={{ ... }}を通常のHTML形式style="..."に変換
+  cleanedHtml = convertJsxStyleToHtml(cleanedHtml);
+
   return cleanedHtml;
+}
+
+/**
+ * JSX形式のstyle={{ ... }}を通常のHTML形式style="..."に変換
+ * @param html - JSX形式のHTML文字列
+ * @returns 通常のHTML形式の文字列
+ */
+function convertJsxStyleToHtml(html: string): string {
+  // style={{ ... }}のパターンを検索して変換
+  return html.replace(
+    /style=\{\{([^}]+)\}\}/g,
+    (match, styleContent) => {
+      // オブジェクト形式のスタイルをCSS文字列に変換
+      // "key": "value" または key: "value" の形式を key: value; に変換
+      const cssString = styleContent
+        .replace(/"([^"]+)":\s*"([^"]+)"/g, '$1: $2;')
+        .replace(/([a-zA-Z-]+):\s*"([^"]+)"/g, '$1: $2;')
+        .replace(/,/g, ' ')
+        .trim();
+
+      return `style="${cssString}"`;
+    }
+  );
 }
 
