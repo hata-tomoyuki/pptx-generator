@@ -9,6 +9,7 @@ import { buildPptxFromHtml } from "../lib/htmlToPptx";
  */
 export function OpenAIExample() {
   const [theme, setTheme] = useState<string>("売上レポート");
+  const [draftText, setDraftText] = useState<string>("");
   const [generatedHtml, setGeneratedHtml] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
@@ -25,7 +26,7 @@ export function OpenAIExample() {
     setGeneratedHtml("");
 
     try {
-      const html = await generateHtmlForPptx(theme);
+      const html = await generateHtmlForPptx(theme, draftText);
       setGeneratedHtml(html);
     } catch (err) {
       setError(err instanceof Error ? err.message : "エラーが発生しました");
@@ -66,9 +67,27 @@ export function OpenAIExample() {
           style={{
             width: "100%",
             padding: "8px",
-            marginBottom: "8px",
+            marginBottom: "12px",
             border: "1px solid #ddd",
             borderRadius: "4px",
+          }}
+        />
+        <label style={{ display: "block", marginBottom: "8px", fontWeight: "bold" }}>
+          原稿テキスト（任意）:
+        </label>
+        <textarea
+          value={draftText}
+          onChange={(e) => setDraftText(e.target.value)}
+          placeholder="スライドの元となる原稿テキストを入力してください。空欄の場合はテーマに基づいて自動生成されます。"
+          style={{
+            width: "100%",
+            minHeight: "120px",
+            padding: "8px",
+            marginBottom: "12px",
+            border: "1px solid #ddd",
+            borderRadius: "4px",
+            fontFamily: "inherit",
+            resize: "vertical",
           }}
         />
         <button
