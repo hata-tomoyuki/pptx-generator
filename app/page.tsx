@@ -1,6 +1,4 @@
-"use client";
-
-import { OpenAIExample } from "./lib/openaiExample";
+import { OpenAIExample } from "./components/openaiExample";
 
 export default function HomePage() {
   return (

@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { generateHtmlForPptx } from "./htmlGenerator";
-import { buildPptxFromHtml } from "./htmlToPptx";
+import { generateHtmlForPptx } from "../lib/htmlGenerator";
+import { buildPptxFromHtml } from "../lib/htmlToPptx";
 
 /**
  * OpenAI APIを使用してPowerPoint用のHTMLを生成し、PPTXに変換するコンポーネント
