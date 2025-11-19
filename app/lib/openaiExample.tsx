@@ -1,34 +1,30 @@
 "use client";
 
 import { useState } from "react";
-import { callOpenAI, type ChatMessage } from "./openaiClient";
+import { generateHtmlForPptx } from "./htmlGenerator";
 
 /**
- * OpenAI APIの使用例コンポーネント
- * このコンポーネントは使用例として作成されています
+ * OpenAI APIを使用してPowerPoint用のHTMLを生成するコンポーネント
  */
 export function OpenAIExample() {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: "user", content: "こんにちは！" },
-  ]);
-  const [response, setResponse] = useState<string>("");
+  const [theme, setTheme] = useState<string>("売上レポート");
+  const [generatedHtml, setGeneratedHtml] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
 
-  const handleSendMessage = async () => {
+  const handleGenerateHtml = async () => {
+    if (!theme.trim()) {
+      setError("テーマを入力してください");
+      return;
+    }
+
     setLoading(true);
     setError("");
-    setResponse("");
+    setGeneratedHtml("");
 
     try {
-      const result = await callOpenAI(messages);
-      const assistantMessage = result.choices[0]?.message?.content || "";
-
-      setResponse(assistantMessage);
-      setMessages([
-        ...messages,
-        { role: "assistant", content: assistantMessage },
-      ]);
+      const html = await generateHtmlForPptx(theme);
+      setGeneratedHtml(html);
     } catch (err) {
       setError(err instanceof Error ? err.message : "エラーが発生しました");
     } finally {
@@ -38,25 +34,26 @@ export function OpenAIExample() {
 
   return (
     <div style={{ padding: "16px", border: "1px solid #ddd", marginTop: "16px" }}>
-      <h3>OpenAI API 使用例</h3>
+      <h3>AIでHTML生成（PowerPoint用）</h3>
       <div style={{ marginBottom: "16px" }}>
-        <textarea
-          value={messages[messages.length - 1]?.content || ""}
-          onChange={(e) =>
-            setMessages([
-              { role: "user", content: e.target.value },
-            ])
-          }
-          placeholder="メッセージを入力..."
+        <label style={{ display: "block", marginBottom: "8px", fontWeight: "bold" }}>
+          テーマ:
+        </label>
+        <input
+          type="text"
+          value={theme}
+          onChange={(e) => setTheme(e.target.value)}
+          placeholder="例: 売上レポート、新商品発表、プロジェクト計画..."
           style={{
             width: "100%",
-            minHeight: "100px",
             padding: "8px",
             marginBottom: "8px",
+            border: "1px solid #ddd",
+            borderRadius: "4px",
           }}
         />
         <button
-          onClick={handleSendMessage}
+          onClick={handleGenerateHtml}
           disabled={loading}
           style={{
             padding: "8px 16px",
@@ -67,15 +64,17 @@ export function OpenAIExample() {
             color: "white",
           }}
         >
-          {loading ? "送信中..." : "送信"}
+          {loading ? "生成中..." : "HTMLを生成"}
         </button>
       </div>
 
       {error && (
-        <div style={{ color: "red", marginTop: "8px" }}>エラー: {error}</div>
+        <div style={{ color: "red", marginTop: "8px", marginBottom: "8px" }}>
+          エラー: {error}
+        </div>
       )}
 
-      {response && (
+      {generatedHtml && (
         <div
           style={{
             marginTop: "16px",
@@ -84,8 +83,21 @@ export function OpenAIExample() {
             borderRadius: "4px",
           }}
         >
-          <strong>レスポンス:</strong>
-          <p>{response}</p>
+          <strong>生成されたHTML:</strong>
+          <pre
+            style={{
+              marginTop: "8px",
+              padding: "12px",
+              backgroundColor: "#fff",
+              border: "1px solid #ddd",
+              borderRadius: "4px",
+              overflow: "auto",
+              maxHeight: "400px",
+              fontSize: "12px",
+            }}
+          >
+            {generatedHtml}
+          </pre>
         </div>
       )}
     </div>
